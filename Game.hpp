@@ -21,8 +21,14 @@
 
 #define PI          3.14159265
 
+// Define the number of bits to shift left or right values
+#define FP_SHIFT 11
+// The fixed point factor (same as shifting FP_SHIFT bits to the left)
+#define FP_FACTOR   2 << FP_SHIFT
+
 #define VELOCIDADE_JOGADOR  5
 
+// All values are multiplied by 256 for fixed point precision
 typedef struct TagEventDescriptor
 {
     int frame;
@@ -36,18 +42,18 @@ typedef struct TagEventDescriptor
 
 typedef struct TagJogador
 {
-    double x;
-    double y;
-    double angulo;
+    int x;
+    int y;
+    int angulo;
 }Jogador;
 
 typedef struct TagIma
 {
-    int     tipo;
-    double  x;
-    double  y;
-    double  angulo;
-    double  velocidade;
+    int tipo;
+    int  x;
+    int  y;
+    int  angulo;
+    int  velocidade;
 }Ima;
 
 class Game {
@@ -65,7 +71,7 @@ public:
     int gamescreen(int controle);
     void processaFase(int mapa[33][59], Jogador *jogador, Ima imas[]);
     void atualizaJogador(int mapa[33][59], Jogador *jogador, int controle);
-    double  calculaAngulo(int x, int y);
+    double  calculaAngulo(const int dx, const int dy);
     bool loadhighscore();
     bool savehighscore();
     bool creditsscreen();

@@ -16,6 +16,10 @@
 #include <stdio.h>
 #include <math.h>
 
+int tg_fp[90]={0, 35, 71, 107, 143, 179, 215, 251, 287, 324, 361, 398, 435, 472, 510, 548, 587, 626, 665, 705, 745, 786, 827, 869, 911, 954, 998, 1043, 1088, 1135, 1182, 1230, 1279, 1329, 1381, 1434, 1487, 1543, 1600, 1658, 1718, 1780, 1844, 1909, 1977, 2047, 2120, 2196, 2274, 2355, 2440, 2529, 2621, 2717, 2818, 2924, 3036, 3153, 3277, 3408, 3547, 3694, 3851, 4019, 4199, 4391, 4599, 4824, 5068, 5335, 5626, 5947, 6303, 6698, 7142, 7643, 8214, 8870, 9635, 10536, 11614, 12930, 14572, 16679, 19485, 23408, 29287, 39078, 58647, 117329}
+int sin_fp[360]={0, 35, 71, 107, 142, 178, 214, 249, 285, 320, 355, 390, 425, 460, 495, 530, 564, 598, 632, 666, 700, 733, 767, 800, 832, 865, 897, 929, 961, 992, 1023, 1054, 1085, 1115, 1145, 1174, 1203, 1232, 1260, 1288, 1316, 1343, 1370, 1396, 1422, 1448, 1473, 1497, 1521, 1545, 1568, 1591, 1613, 1635, 1656, 1677, 1697, 1717, 1736, 1755, 1773, 1791, 1808, 1824, 1840, 1856, 1870, 1885, 1898, 1911, 1924, 1936, 1947, 1958, 1968, 1978, 1987, 1995, 2003, 2010, 2016, 2022, 2028, 2032, 2036, 2040, 2043, 2045, 2046, 2047, 2048, 2047, 2046, 2045, 2043, 2040, 2036, 2032, 2028, 2022, 2016, 2010, 2003, 1995, 1987, 1978, 1968, 1958, 1947, 1936, 1924, 1911, 1898, 1885, 1870, 1856, 1840, 1824, 1808, 1791, 1773, 1755, 1736, 1717, 1697, 1677, 1656, 1635, 1613, 1591, 1568, 1545, 1521, 1497, 1473, 1448, 1422, 1396, 1370, 1343, 1316, 1288, 1260, 1232, 1203, 1174, 1145, 1115, 1085, 1054, 1024, 992, 961, 929, 897, 865, 832, 800, 767, 733, 700, 666, 632, 598, 564, 530, 495, 460, 425, 390, 355, 320, 285, 249, 214, 178, 142, 107, 71, 35, 0, -35, -71, -107, -142, -178, -214, -249, -285, -320, -355, -390, -425, -460, -495, -530, -564, -598, -632, -666, -700, -733, -767, -800, -832, -865, -897, -929, -961, -992, -1023, -1054, -1085, -1115, -1145, -1174, -1203, -1232, -1260, -1288, -1316, -1343, -1370, -1396, -1422, -1448, -1473, -1497, -1521, -1545, -1568, -1591, -1613, -1635, -1656, -1677, -1697, -1717, -1736, -1755, -1773, -1791, -1808, -1824, -1840, -1856, -1870, -1885, -1898, -1911, -1924, -1936, -1947, -1958, -1968, -1978, -1987, -1995, -2003, -2010, -2016, -2022, -2028, -2032, -2036, -2040, -2043, -2045, -2046, -2047, -2048, -2047, -2046, -2045, -2043, -2040, -2036, -2032, -2028, -2022, -2016, -2010, -2003, -1995, -1987, -1978, -1968, -1958, -1947, -1936, -1924, -1911, -1898, -1885, -1870, -1856, -1840, -1824, -1808, -1791, -1773, -1755, -1736, -1717, -1697, -1677, -1656, -1635, -1613, -1591, -1568, -1545, -1521, -1497, -1473, -1448, -1422, -1396, -1370, -1343, -1316, -1288, -1260, -1232, -1203, -1174, -1145, -1115, -1085, -1054, -1024, -992, -961, -929, -897, -865, -832, -800, -767, -733, -700, -666, -632, -598, -564, -530, -495, -460, -425, -390, -355, -320, -285, -249, -214, -178, -142, -107, -71, -35}
+int cos_fp[360]={2048, 2047, 2046, 2045, 2043, 2040, 2036, 2032, 2028, 2022, 2016, 2010, 2003, 1995, 1987, 1978, 1968, 1958, 1947, 1936, 1924, 1911, 1898, 1885, 1870, 1856, 1840, 1824, 1808, 1791, 1773, 1755, 1736, 1717, 1697, 1677, 1656, 1635, 1613, 1591, 1568, 1545, 1521, 1497, 1473, 1448, 1422, 1396, 1370, 1343, 1316, 1288, 1260, 1232, 1203, 1174, 1145, 1115, 1085, 1054, 1024, 992, 961, 929, 897, 865, 832, 800, 767, 733, 700, 666, 632, 598, 564, 530, 495, 460, 425, 390, 355, 320, 285, 249, 214, 178, 142, 107, 71, 35, 0, -35, -71, -107, -142, -178, -214, -249, -285, -320, -355, -390, -425, -460, -495, -530, -564, -598, -632, -666, -700, -733, -767, -800, -832, -865, -897, -929, -961, -992, -1023, -1054, -1085, -1115, -1145, -1174, -1203, -1232, -1260, -1288, -1316, -1343, -1370, -1396, -1422, -1448, -1473, -1497, -1521, -1545, -1568, -1591, -1613, -1635, -1656, -1677, -1697, -1717, -1736, -1755, -1773, -1791, -1808, -1824, -1840, -1856, -1870, -1885, -1898, -1911, -1924, -1936, -1947, -1958, -1968, -1978, -1987, -1995, -2003, -2010, -2016, -2022, -2028, -2032, -2036, -2040, -2043, -2045, -2046, -2047, -2048, -2047, -2046, -2045, -2043, -2040, -2036, -2032, -2028, -2022, -2016, -2010, -2003, -1995, -1987, -1978, -1968, -1958, -1947, -1936, -1924, -1911, -1898, -1885, -1870, -1856, -1840, -1824, -1808, -1791, -1773, -1755, -1736, -1717, -1697, -1677, -1656, -1635, -1613, -1591, -1568, -1545, -1521, -1497, -1473, -1448, -1422, -1396, -1370, -1343, -1316, -1288, -1260, -1232, -1203, -1174, -1145, -1115, -1085, -1054, -1024, -992, -961, -929, -897, -865, -832, -800, -767, -733, -700, -666, -632, -598, -564, -530, -495, -460, -425, -390, -355, -320, -285, -249, -214, -178, -142, -107, -71, -35, 0, 35, 71, 107, 142, 178, 214, 249, 285, 320, 355, 390, 425, 460, 495, 530, 564, 598, 632, 666, 700, 733, 767, 800, 832, 865, 897, 929, 961, 992, 1023, 1054, 1085, 1115, 1145, 1174, 1203, 1232, 1260, 1288, 1316, 1343, 1370, 1396, 1422, 1448, 1473, 1497, 1521, 1545, 1568, 1591, 1613, 1635, 1656, 1677, 1697, 1717, 1736, 1755, 1773, 1791, 1808, 1824, 1840, 1856, 1870, 1885, 1898, 1911, 1924, 1936, 1947, 1958, 1968, 1978, 1987, 1995, 2003, 2010, 2016, 2022, 2028, 2032, 2036, 2040, 2043, 2045, 2046, 2047}
+
 Game::Game() {
     initialized=false;
 }
@@ -178,6 +182,7 @@ int Game::gamescreen(int controle){
     int cenario = C2D_CarregaSpriteSet("gfx/map.png", 32, 32);
     int spriteJogador = C2D_CarregaSpriteSet("gfx/jogador.png", 32, 32);
     int spriteIma = C2D_CarregaSpriteSet("gfx/imas.png", 20, 20);
+    int spritemouse = C2D_CarregaSpriteSet("gfx/mouse.png", 0, 0);
     for(int x=0;x<59;x++)
     {
         mapa[0][x]=JOGO_PAREDE;
@@ -217,10 +222,12 @@ int Game::gamescreen(int controle){
                 else
                     C2D_DesenhaSprite(cenario, 1, DESLX+32*j, DESLY+32*i);
         // Desenha os personagens
-        C2D_DesenhaSpriteEspecial(spriteJogador, 0, DESLX+(int)jogador.x, DESLY+(int)jogador.y, C2D_FLIP_NENHUM, 1.0, 1.0, jogador.angulo);
+        C2D_DesenhaSpriteEspecial(spriteJogador, 0, DESLX+(jogador.x >> FP_SHIFT), DESLY+(jogador.y >> FP_SHIFT), C2D_FLIP_NENHUM, 1.0, 1.0, jogador.angulo);
         for(int i=0;i<MAX_IMAS;i++)
             if(imas[i].tipo!=JOGO_MORTO)
-                C2D_DesenhaSprite(spriteIma, imas[i].tipo-JOGO_NEGATIVO, DESLX+(int)imas[i].x, DESLY+(int)imas[i].y);
+                C2D_DesenhaSprite(spriteIma, imas[i].tipo-JOGO_NEGATIVO, DESLX+(imas[i].x >> FP_SHIfT), DESLY+(imas[i].y >> FP_SHiFT));
+        if(controle == game_keyplusmouse)
+            C2D_DesenhaSprite(spritemouse, 0, mouse->x-5, mouse->y-5);
         C2D_Sincroniza(C2D_FPS_PADRAO);
 
     }
@@ -237,8 +244,8 @@ void Game::processaFase(int mapa[33][59], Jogador *jogador, Ima imas[])
             switch(mapa[i][j])
             {
             case JOGO_JOGADOR:
-                jogador->x=32*j;
-                jogador->y=32*i;
+                jogador->x=(32*j) << FP_SHIFT;
+                jogador->y=(32*i) << FP_SHIFT;
                 jogador->angulo=0;
                 mapa[i][j]=JOGO_CHAO;
                 break;
@@ -249,8 +256,8 @@ void Game::processaFase(int mapa[33][59], Jogador *jogador, Ima imas[])
                     imas[contaImas].tipo=mapa[i][j];
                     imas[contaImas].angulo=0;
                     imas[contaImas].velocidade=0;
-                    imas[contaImas].x=32*j+6;
-                    imas[contaImas].y=32*i+6;
+                    imas[contaImas].x=(32*j+6)  << FP_SHIFT;
+                    imas[contaImas].y=(32*i+6)  << FP_SHIFT;
                     mapa[i][j]=JOGO_CHAO;
                     contaImas++;
                 }
@@ -264,6 +271,8 @@ void Game::processaFase(int mapa[33][59], Jogador *jogador, Ima imas[])
 
 void Game::atualizaJogador(int mapa[33][59], Jogador *jogador, int controle)
 {
+    // as variáveis para guardar as coordenadas do jogador
+    double x=jogador->x, y=jogador->y;
     // Escolhe se o controle é pelo gamepad ou pelo teclado
     if(controle==Game::game_gamepad)
     {
@@ -271,40 +280,74 @@ void Game::atualizaJogador(int mapa[33][59], Jogador *jogador, int controle)
         {
             // Calcula o ângulo do deslocamento
             double angulo = calculaAngulo(gamepads[0].eixos[C2D_GLEIXOX], gamepads[0].eixos[C2D_GLEIXOY]);
+            printf("Eixo x: %03d - Eixo y: %03d - Angulo: %f\n", gamepads[0].eixos[C2D_GLEIXOX], gamepads[0].eixos[C2D_GLEIXOY], angulo);
             // Calcula a nova posição
-            double x = jogador->x+cos(jogador->angulo*PI/180)*VELOCIDADE_JOGADOR;
-            double y = jogador->y+sin(jogador->angulo*PI/180)*VELOCIDADE_JOGADOR;
-            jogador->x = x;
-            jogador->y = y;
+            x = jogador->x+cos(jogador->angulo*PI/180)*VELOCIDADE_JOGADOR;
+            y = jogador->y+sin(jogador->angulo*PI/180)*VELOCIDADE_JOGADOR;
+
         }
         // Calcula o angulo em que desenha o elemento
         jogador->angulo=calculaAngulo(gamepads[0].eixos[C2D_GREIXOX], gamepads[0].eixos[C2D_GREIXOY]);
     }
+    else
+    {
+        if(teclado[C2D_TESQUERDA].pressionando && !teclado[C2D_TCIMA].pressionando && !teclado[C2D_TBAIXO].pressionando)
+            x=jogador->x-VELOCIDADE_JOGADOR;
+        else if(teclado[C2D_TDIREITA].pressionando && !teclado[C2D_TCIMA].pressionando && !teclado[C2D_TBAIXO].pressionando)
+            x=jogador->x+VELOCIDADE_JOGADOR;
+        else if(teclado[C2D_TCIMA].pressionando && !teclado[C2D_TDIREITA].pressionando && !teclado[C2D_TESQUERDA].pressionando)
+            y=jogador->y-VELOCIDADE_JOGADOR;
+        else if(teclado[C2D_TBAIXO].pressionando && !teclado[C2D_TDIREITA].pressionando && !teclado[C2D_TESQUERDA].pressionando)
+            y=jogador->y+VELOCIDADE_JOGADOR;
+        else if(teclado[C2D_TCIMA].pressionando && teclado[C2D_TDIREITA].pressionando)
+        {
+            x=jogador->x+VELOCIDADE_JOGADOR*0.707106781;
+            y=jogador->y-VELOCIDADE_JOGADOR*0.707106781;
+        }
+        else if(teclado[C2D_TCIMA].pressionando && teclado[C2D_TESQUERDA].pressionando)
+        {
+            x=jogador->x-VELOCIDADE_JOGADOR*0.707106781;
+            y=jogador->y-VELOCIDADE_JOGADOR*0.707106781;
+        }
+        else if(teclado[C2D_TBAIXO].pressionando && teclado[C2D_TESQUERDA].pressionando)
+        {
+            x=jogador->x-VELOCIDADE_JOGADOR*0.707106781;
+            y=jogador->y+VELOCIDADE_JOGADOR*0.707106781;
+        }
+        else if(teclado[C2D_TBAIXO].pressionando && teclado[C2D_TESQUERDA].pressionando)
+        {
+            x=jogador->x-VELOCIDADE_JOGADOR*0.707106781;
+            y=jogador->y+VELOCIDADE_JOGADOR*0.707106781;
+        }
+        else if(teclado[C2D_TBAIXO].pressionando && teclado[C2D_TDIREITA].pressionando)
+        {
+            x=jogador->x+VELOCIDADE_JOGADOR*0.707106781;
+            y=jogador->y+VELOCIDADE_JOGADOR*0.707106781;
+        }
+        jogador->angulo=calculaAngulo(mouse->x-(jogador->x+16), mouse->y-(jogador->y+16));
+    }
+
+    // Atualiza a posição do jogador
+    jogador->x=x;
+    jogador->y=y;
 }
 
-double Game::calculaAngulo(int x, int y)
+double Game::calculaAngulo(const int dx, const int dy)
 {
     // Verifica se é um ângulo paralelo a um dos eixos
-    if(x==0)
-    {
-        if(y==0)
-            return 0;
-        else if(y>0)
-            return 90;
-        else
-            return 270;
-    }
-    if(y==0)
-    {
-        if(x==0)
-            return 0;
-        else if(x>0)
-            return 0;
-        else
-            return 180;
-    }
-    double tangente = y/x;
-    return atan(tangente)*180/PI;
+    double angulo;
+    if(dx==0)
+        angulo=90;
+    else
+        angulo = atan(float(abs(dy))/float(abs(dx)))*180/PI;
+    // According to the quadrant we are, we should add 90, 180 or 270 degrees
+    if(dx<0 && dy >= 0)
+        angulo=180-angulo;
+    else if(dx<=0 && dy < 0)
+        angulo += 180;
+    else if(dx>0 && dy <0)
+        angulo = 360 - angulo;
+    return angulo;
 }
 
 bool Game::creditsscreen(){
