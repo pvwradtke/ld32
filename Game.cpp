@@ -197,6 +197,7 @@ int Game::gamescreen(int controle){
     mapa[16][29]=JOGO_JOGADOR;
     mapa[10][49]=JOGO_POSITIVO;
     mapa[23][10]=JOGO_NEGATIVO;
+    mapa[20][33]=JOGO_PAREDE;
 
     // Inicializa a fase com os dados do mapa
     Jogador jogador;
@@ -271,19 +272,20 @@ void Game::processaFase(int mapa[33][59], Jogador *jogador, Ima imas[])
 
 void Game::atualizaJogador(int mapa[33][59], Jogador *jogador, int controle)
 {
+    static int counter =0;
     // as variáveis para guardar as coordenadas do jogador
-    double x=jogador->x, y=jogador->y;
+    int x=jogador->x, y=jogador->y;
     // Escolhe se o controle é pelo gamepad ou pelo teclado
     if(controle==Game::game_gamepad)
     {
-        if(gamepads[0].eixos[C2D_GLEIXOX]!=0 && gamepads[0].eixos[C2D_GLEIXOY]!=0)
+        if(gamepads[0].eixos[C2D_GLEIXOX]!=0 || gamepads[0].eixos[C2D_GLEIXOY]!=0)
         {
             // Calcula o ângulo do deslocamento
-            double angulo = calculaAngulo(gamepads[0].eixos[C2D_GLEIXOX], gamepads[0].eixos[C2D_GLEIXOY]);
-            printf("Eixo x: %03d - Eixo y: %03d - Angulo: %f\n", gamepads[0].eixos[C2D_GLEIXOX], gamepads[0].eixos[C2D_GLEIXOY], angulo);
+            int angulo = calculaAngulo(gamepads[0].eixos[C2D_GLEIXOX], gamepads[0].eixos[C2D_GLEIXOY]);
+            printf("Contador: %04d - Eixo x: %03d - Eixo y: %03d\n", counter++, gamepads[0].eixos[C2D_GLEIXOX], gamepads[0].eixos[C2D_GLEIXOY]);
             // Calcula a nova posição
-            x = jogador->x+cos_fp[jogador->angulo]*VELOCIDADE_JOGADOR;
-            y = jogador->y+sin_fp[jogador->angulo]*VELOCIDADE_JOGADOR;
+            x = jogador->x+cos_fp[angulo]*VELOCIDADE_JOGADOR;
+            y = jogador->y+sin_fp[angulo]*VELOCIDADE_JOGADOR;
 
         }
         // Calcula o angulo em que desenha o elemento
@@ -325,12 +327,55 @@ void Game::atualizaJogador(int mapa[33][59], Jogador *jogador, int controle)
             y=jogador->y+VELOCIDADE_JOGADOR*sin_fp[45];
         }
         jogador->angulo=calculaAngulo((mouse->x << FP_SHIFT)-(jogador->x+(16 << FP_SHIFT)), (mouse->y << FP_SHIFT)-(jogador->y+(16 << FP_SHIFT)));
-        printf("Angulo do jogador: %f\n", jogador->angulo);
     }
-
+    // Verifica se o jogador está entrando dentro de um bloco
+        int xesq = (x >> FP_SHIFT)/32;
+        int xdir = ((x >> FP_SHIFT)+32)/32;
+        int ycima = (y >> FP_SHIFT)/32;
+        int ybaixo = ((y >> FP_SHIFT) + 32)/32;
+    // Está batendo em cima?
+        if(mapa[ycima][xesq] != JOGO_CHAO && mapa[ycima][xdir] != JOGO_CHAO)
+            y=((ycima+1)*32) << FP_SHIFT;
+    // Está batendo embaixo?
+        if(mapa[ybaixo][xesq] != JOGO_CHAO && mapa[ybaixo][xdir] != JOGO_CHAO)
+            y=(ybaixo-1)*32 << FP_SHIFT;
+    // Está batendo à esquerda
+        if(mapa[ycima][xesq] != JOGO_CHAO && mapa[ybaixo][xesq] != JOGO_CHAO)
+            x=(xesq+1)*32 << FP_SHIFT;
+    // Está batendo à direita
+        if(mapa[ybaixo][xdir] != JOGO_CHAO && mapa[ycima][xdir] != JOGO_CHAO)
+            x=(xdir-1)*32 << FP_SHIFT;
+    // Verifica se são cantos (caso à parte)
+    /*int xabs=x>>FP_SHIFT;
+    int yabs=y>>FP_SHIFT;
+    if((mapa[ycima][xesq] != JOGO_CHAO || mapa[ybaixo][xesq] != JOGO_CHAO))
+        if(abs(ycima*32-yabs) <= 16 && abs(xesq*32-xabs) > 16)
+        {
+            x=(xesq+1)*32 << FP_SHIFT;
+            xesq += 1;
+        }
+    if((mapa[ycima][xdir] != JOGO_CHAO || mapa[ybaixo][xdir] != JOGO_CHAO))
+        if(abs(ycima*32-yabs) <=16 && abs(xesq*32-xabs) >16 )
+        {
+            x=(xesq)*32 << FP_SHIFT;
+            xdir -= 1;
+        }
+    if((mapa[ycima][xesq] != JOGO_CHAO || mapa[ycima][xdir] != JOGO_CHAO))
+        if(abs(ycima*32-yabs) > 16 && abs(xesq*32-xabs)<=16)
+        {
+            ycima+=1;
+            y=ycima*32 << FP_SHIFT;
+        }
+    if((mapa[ybaixo][xesq] != JOGO_CHAO || mapa[ybaixo][xdir] != JOGO_CHAO))
+        if(abs(ycima*32-yabs) <16 &&  abs(xesq*32-xabs)<=16)
+        {
+            ybaixo-=1;
+            y=ycima*32 << FP_SHIFT;
+        }*/
     // Atualiza a posição do jogador
     jogador->x=x;
     jogador->y=y;
+
 }
 
 int Game::calculaAngulo(const int dx, const int dy)
