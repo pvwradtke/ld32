@@ -61,10 +61,11 @@ bool Game::run(){
                 creditsscreen();
                 currentstate = Game::mainmenuscreen();
                 break;
-            case Game::game:{
+            case Game::game_gamepad:
+            case Game::game_keyplusmouse:{
                 srand(time(NULL));
                 int previousHighScore = highScore;
-                if(gamescreen())
+                if(gamescreen(currentstate))
                     currentstate = creditsscreen();
                else
                     currentstate = Game::mainmenu;
@@ -150,12 +151,54 @@ int Game::mainmenuscreen(){
             end = true;
             choice = Game::credits;
         }
+        else if(teclado[C2D_TESPACO].pressionou)
+        {
+            end=true;
+            choice = Game::game_keyplusmouse;
+        }
+        else if(gamepads[0].botoes[C2D_GBOTAO_A].pressionou)
+        {
+            end = true;
+            choice = Game::game_gamepad;
+        }
     }
     return choice;
 }
 
-int Game::gamescreen(){
+int Game::gamescreen(int controle){
+    // The current map
+    int mapa[33][60];
+    memset(mapa, JOGO_CHAO, 33*60*sizeof(int));
     // Load resources
+    int cenario = C2D_CarregaSpriteSet("gfx/map.png", 32, 32);
+    for(int x=0;x<60;x++)
+    {
+        mapa[0][x]=JOGO_PAREDE;
+        mapa[32][x]=JOGO_PAREDE;
+    }
+    for(int y=0;y<33;y++)
+    {
+        mapa[y][0]=JOGO_PAREDE;
+        mapa[y][59]=JOGO_PAREDE;
+    }
+
+    C2D_TrocaCorLimpezaTela(0,0,0);
+    bool fim=false;
+    while(!fim)
+    {
+        if(teclado[C2D_TESC].pressionou || teclado[C2D_TENCERRA].pressionou)
+            fim=true;
+        C2D_LimpaTela();
+        // Desenha o mapa
+        for(int i=0;i<33;i++)
+            for(int j=0;j<60;j++)
+                if(mapa[i][j]==JOGO_CHAO)
+                    C2D_DesenhaSprite(cenario, 0, 32*j, 12+32*i);
+                else
+                    C2D_DesenhaSprite(cenario, 1, 32*j, 12+32*i);
+        C2D_Sincroniza(C2D_FPS_PADRAO);
+
+    }
     return 0;
 }
 

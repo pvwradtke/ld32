@@ -26,7 +26,8 @@ typedef struct TagEventDescriptor
 
 class Game {
 public:
-    enum States{splash, mainmenu, help, game, tutorial, credits, gameover, quit};
+    enum States{splash, mainmenu, help, game_keyplusmouse, game_gamepad, tutorial, credits, gameover, quit};
+    enum marcas{JOGO_CHAO=0, JOGO_PAREDE, JOGO_JOGADOR, JOGO_INIMIGO, JOGO_POSITIVO, JOGO_NEGATIVO};
     enum EventDescriptorType {eventtext, eventenemy, eventjump, eventend, eventdisablescore, eventmusic, eventcomment};
     Game();
     virtual ~Game();
@@ -35,7 +36,7 @@ public:
     bool run();
     bool splashscreen();
     int mainmenuscreen();
-    int gamescreen();
+    int gamescreen(int controle);
     bool loadhighscore();
     bool savehighscore();
     bool creditsscreen();

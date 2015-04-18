@@ -1,10 +1,10 @@
 # depslib dependency file v1.0
-1429326916 source:/home/paulo/repositories/chien2d/src/chien2d.cpp
+1429341084 source:/home/paulo/repositories/chien2d/src/chien2d.cpp
 	<math.h>
 	<assert.h>
 	<c2d3/chien2d.h>
 
-1429326915 /home/paulo/repositories/chien2d/include//c2d3/chien2d.h
+1429334324 /home/paulo/repositories/chien2d/include//c2d3/chien2d.h
 	<SDL2/SDL.h>
 	<SDL2/SDL_image.h>
 	<SDL2/SDL_mixer.h>
@@ -20,8 +20,35 @@
 1429326915 /home/paulo/repositories/chien2d/include//c2d3/chienaudio.h
 	<SDL2/SDL_mixer.h>
 
-1429328884 source:/home/paulo/repositories/ludum_dare_32/main.cpp
+1429330081 source:/home/paulo/repositories/ludum_dare_32/main.cpp
+	<cstdlib>
+	<string.h>
+	"Game.hpp"
+
+1429339272 source:/home/paulo/repositories/ludum_dare_32/Game.cpp
+	"Game.hpp"
+	<sstream>
+	<iostream>
+	<cstdlib>
+	<vector>
+	<memory>
+	<stdlib.h>
+	<time.h>
 	<stdio.h>
+
+1429338268 /home/paulo/repositories/ludum_dare_32/Game.hpp
+	<memory>
+	<string>
 	<c2d3/chien2d.h>
 	<c2d3/chienaudio.h>
+
+1429334324 /home/paulo/repositories/chien2d/include/c2d3/chien2d.h
+	<SDL2/SDL.h>
+	<SDL2/SDL_image.h>
+	<SDL2/SDL_mixer.h>
+	<SDL2/SDL_ttf.h>
+	<windows.h>
+
+1429326915 /home/paulo/repositories/chien2d/include/c2d3/chienaudio.h
+	<SDL2/SDL_mixer.h>
 
