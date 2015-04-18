@@ -71,7 +71,7 @@ public:
     int gamescreen(int controle);
     void processaFase(int mapa[33][59], Jogador *jogador, Ima imas[]);
     void atualizaJogador(int mapa[33][59], Jogador *jogador, int controle);
-    double  calculaAngulo(const int dx, const int dy);
+    int  calculaAngulo(const int dx, const int dy);
     bool loadhighscore();
     bool savehighscore();
     bool creditsscreen();
