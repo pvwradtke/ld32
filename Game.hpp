@@ -32,6 +32,11 @@
 #define TAM_JOGADOR     32
 #define TAM_ESTRELA     32
 
+#define MAPA_LINHAS     33
+#define MAPA_COLUNAS    59
+
+typedef int Mapa[MAPA_LINHAS][MAPA_COLUNAS];
+
 // All values are multiplied by 256 for fixed point precision
 typedef struct TagEventDescriptor
 {
@@ -67,7 +72,7 @@ typedef struct TagPersonagem
 class Game {
 public:
     enum States{splash, mainmenu, help, game_keyplusmouse, game_gamepad, tutorial, credits, gameover, quit};
-    enum marcas{JOGO_CHAO=0, JOGO_PAREDE, JOGO_NADA, JOGO_JOGADOR, JOGO_INIMIGO, JOGO_NEGATIVO, JOGO_POSITIVO, JOGO_MORTO, JOGO_ESTRELA, JOGO_ESTRELA0, JOGO_ESTRELA45, JOGO_ESTRELA90,
+    enum marcas{JOGO_NADA=0, JOGO_CHAO, JOGO_PAREDE, JOGO_JOGADOR, JOGO_NEGATIVO, JOGO_POSITIVO, JOGO_MORTO, JOGO_ESTRELA, JOGO_ESTRELA0, JOGO_ESTRELA45, JOGO_ESTRELA90,
             JOGO_ESTRELA135, JOGO_ESTRELA180, JOGO_ESTRELA225, JOGO_ESTRELA270, JOGO_ESTRELA315, JOGO_ESTRELA_MORRENDO, JOGO_ARMADILHA};
     enum EventDescriptorType {eventtext, eventenemy, eventjump, eventend, eventdisablescore, eventmusic, eventcomment};
     Game();
@@ -77,11 +82,12 @@ public:
     bool run();
     bool splashscreen();
     int mainmenuscreen();
-    int gamescreen(int controle);
-    void processaFase(int mapa[33][59], Jogador *jogador, Personagem imas[], Personagem estrelas[]);
-    void atualizaJogador(int mapa[33][59], Jogador *jogador, int controle);
-    void atualizaIma(int mapa[33][59], Personagem *ima, Jogador *jogador);
-    void atualizaEstrela(int mapa[33][59], Personagem *estrela);
+    int gamescreen(int controle, int numFase, char *arquivoFase);
+    void processaFase(Mapa mapa, Jogador *jogador, Personagem imas[], Personagem estrelas[]);
+    bool carregaFase(char *name, char *mensagem, Mapa mapa);
+    void atualizaJogador(Mapa mapa, Jogador *jogador, int controle);
+    void atualizaIma(Mapa mapa, Personagem *ima, Jogador *jogador);
+    void atualizaEstrela(Mapa mapa, Personagem *estrela);
     int colisoesImasEstrelas(Personagem imas[], Personagem estrelas[]);
     bool colisaoJogadorEstrelas(Jogador *jogador, Personagem estrelas[]);
     float  calculaAngulo(const float dx, const float dy);

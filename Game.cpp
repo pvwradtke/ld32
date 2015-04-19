@@ -66,12 +66,14 @@ bool Game::run(){
             case Game::game_keyplusmouse:{
                 srand(time(NULL));
                 int previousHighScore = highScore;
-                if(gamescreen(currentstate))
+                int resultado = gamescreen(currentstate, 1, "maps/stage01.dat");
+                currentstate = Game::mainmenu;
+/*                if(resultado>0)
                     currentstate = creditsscreen();
                else
                     currentstate = Game::mainmenu;
                if(highScore > previousHighScore)
-                    savehighscore();
+                    savehighscore();*/
                 break;
             }
             case Game::tutorial:
@@ -170,17 +172,24 @@ int Game::mainmenuscreen(){
     return choice;
 }
 
-int Game::gamescreen(int controle){
+int Game::gamescreen(int controle, int numFase, char *arquivoFase){
     // The current map
-    int mapa[33][59];
-    memset(mapa, JOGO_CHAO, 33*59*sizeof(int));
+    Mapa mapa;
+    //memset(mapa, JOGO_CHAO, 33*59*sizeof(int));
     // Load resources
     int cenario = C2D_CarregaSpriteSet("gfx/map.png", 32, 32);
     int spriteJogador = C2D_CarregaSpriteSet("gfx/jogador.png", 32, 32);
     int spriteIma = C2D_CarregaSpriteSet("gfx/imas.png", 20, 20);
     int spritemouse = C2D_CarregaSpriteSet("gfx/mouse.png", 0, 0);
     int spriteEstrela =C2D_CarregaSpriteSet("gfx/inimigo.png", 32, 32);
-    for(int x=0;x<59;x++)
+    char mensagem[512];
+    if(!carregaFase(arquivoFase, mensagem, mapa))
+    {
+        printf("Erro ao carregar a fase");
+        return -1;
+    }
+
+/*    for(int x=0;x<59;x++)
     {
         mapa[0][x]=JOGO_PAREDE;
         mapa[32][x]=JOGO_PAREDE;
@@ -198,7 +207,7 @@ int Game::gamescreen(int controle){
     mapa[22][33]=JOGO_PAREDE;
     mapa[20][35]=JOGO_PAREDE;
     mapa[9][15]=JOGO_ESTRELA0;
-    mapa[12][17]=JOGO_ESTRELA315;
+    mapa[12][17]=JOGO_ESTRELA315;*/
 
     // Inicializa a fase com os dados do mapa
     Jogador jogador;
@@ -231,7 +240,7 @@ int Game::gamescreen(int controle){
             for(int j=0;j<59;j++)
                 if(mapa[i][j]==JOGO_CHAO)
                     C2D_DesenhaSprite(cenario, 0, DESLX+32*j, DESLY+32*i);
-                else
+                else if(mapa[i][j]==JOGO_PAREDE)
                     C2D_DesenhaSprite(cenario, 1, DESLX+32*j, DESLY+32*i);
         // Desenha os personagens
         for(int i=0;i<MAX_ESTRELAS;i++)
@@ -259,7 +268,7 @@ int Game::gamescreen(int controle){
     return 0;
 }
 
-void Game::processaFase(int mapa[33][59], Jogador *jogador, Personagem imas[], Personagem estrelas[])
+void Game::processaFase(Mapa mapa, Jogador *jogador, Personagem imas[], Personagem estrelas[])
 {
     // Procura os elementos
     int contaImas=0;
@@ -331,7 +340,30 @@ void Game::processaFase(int mapa[33][59], Jogador *jogador, Personagem imas[], P
         estrelas[i].tipo=JOGO_MORTO;
 }
 
-void Game::atualizaJogador(int mapa[33][59], Jogador *jogador, int controle)
+bool Game::carregaFase(char *name, char *mensagem, Mapa mapa)
+{
+    FILE *arquivo = fopen(name, "r");
+    if(arquivo==0)
+        return false;
+    if(fgets(mensagem, 256, arquivo))
+        // Removes the new line in the end of this string
+        mensagem[strlen(mensagem)-1]=0;
+    else{
+        fclose(arquivo);
+        return false;
+    }
+    // reds the map
+    for(int i=0;i<MAPA_LINHAS;i++)
+        for(int j=0;j<MAPA_COLUNAS;j++)
+        if(fscanf(arquivo, "%d", &mapa[i][j])==0)
+        {
+            fclose(arquivo);
+            return false;
+        }
+    return true;
+}
+
+void Game::atualizaJogador(Mapa mapa, Jogador *jogador, int controle)
 {
     static int counter =0;
     // as variáveis para guardar as coordenadas do jogador
@@ -412,7 +444,7 @@ void Game::atualizaJogador(int mapa[33][59], Jogador *jogador, int controle)
 
 }
 
-void Game::atualizaIma(int mapa[33][59], Personagem *ima, Jogador *jogador)
+void Game::atualizaIma(Mapa mapa, Personagem *ima, Jogador *jogador)
 {
     //  se o jogador está perto para ganhar velocidade e direção
     int xcentroj = jogador->x + (TAM_JOGADOR/2);
@@ -512,7 +544,7 @@ void Game::atualizaIma(int mapa[33][59], Personagem *ima, Jogador *jogador)
     ima->y=y;
 }
 
-void Game::atualizaEstrela(int mapa[33][59], Personagem *estrela)
+void Game::atualizaEstrela(Mapa mapa, Personagem *estrela)
 {
     // Se está morrendo, simplesmente decrementa o contador de morte e volta
     if(estrela->tipo == JOGO_ESTRELA_MORRENDO)
