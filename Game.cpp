@@ -179,6 +179,7 @@ int Game::gamescreen(int controle){
     int spriteJogador = C2D_CarregaSpriteSet("gfx/jogador.png", 32, 32);
     int spriteIma = C2D_CarregaSpriteSet("gfx/imas.png", 20, 20);
     int spritemouse = C2D_CarregaSpriteSet("gfx/mouse.png", 0, 0);
+    int spriteEstrela =C2D_CarregaSpriteSet("gfx/inimigo.png", 32, 32);
     for(int x=0;x<59;x++)
     {
         mapa[0][x]=JOGO_PAREDE;
@@ -196,14 +197,18 @@ int Game::gamescreen(int controle){
     mapa[20][33]=JOGO_PAREDE;
     mapa[22][33]=JOGO_PAREDE;
     mapa[20][35]=JOGO_PAREDE;
+    mapa[9][15]=JOGO_ESTRELA0;
+    mapa[12][17]=JOGO_ESTRELA315;
 
     // Inicializa a fase com os dados do mapa
     Jogador jogador;
-    Ima imas[MAX_IMAS];
-    processaFase(mapa, &jogador, imas);
+    Personagem imas[MAX_IMAS];
+    Personagem estrelas[MAX_ESTRELAS];
+    processaFase(mapa, &jogador, imas, estrelas);
 
     C2D_TrocaCorLimpezaTela(0,0,0);
     bool fim=false;
+    int placar=0;
     while(!fim)
     {
         // Lógica dos personagens
@@ -211,6 +216,11 @@ int Game::gamescreen(int controle){
         for(int i=0;i<MAX_IMAS;i++)
                 if(imas[i].tipo!=JOGO_MORTO)
                     atualizaIma(mapa, &imas[i], &jogador);
+        for(int i=0;i<MAX_ESTRELAS;i++)
+            if(estrelas[i].tipo != JOGO_MORTO)
+                atualizaEstrela(mapa, &estrelas[i]);
+        // Algum ímã atingiu uma estrela
+        placar+=colisoesImasEstrelas(imas, estrelas);
 
         if(teclado[C2D_TESC].pressionou || teclado[C2D_TENCERRA].pressionou)
             fim=true;
@@ -224,6 +234,19 @@ int Game::gamescreen(int controle){
                 else
                     C2D_DesenhaSprite(cenario, 1, DESLX+32*j, DESLY+32*i);
         // Desenha os personagens
+        for(int i=0;i<MAX_ESTRELAS;i++)
+            if(estrelas[i].tipo!=JOGO_MORTO)
+            {
+                if(estrelas[i].tipo == JOGO_ESTRELA_MORRENDO)
+                {
+                    C2D_AlteraAlphaDoSprite(spriteEstrela, estrelas[i].timer);
+                    if((estrelas[i].timer/4)%2)
+                        C2D_DesenhaSpriteEspecial(spriteEstrela, 1, DESLX+estrelas[i].x, DESLY+estrelas[i].y, C2D_FLIP_NENHUM, 1.0, 1.0, estrelas[i].anguloRotacao);
+                    C2D_RestauraAlphaDoSprite(spriteEstrela);
+                }
+                else
+                    C2D_DesenhaSpriteEspecial(spriteEstrela, 0, DESLX+estrelas[i].x, DESLY+estrelas[i].y, C2D_FLIP_NENHUM, 1.0, 1.0, estrelas[i].anguloRotacao);
+            }
         C2D_DesenhaSpriteEspecial(spriteJogador, 0, DESLX+(int)jogador.x, DESLY+(int)jogador.y, C2D_FLIP_NENHUM, 1.0, 1.0, jogador.angulo);
         for(int i=0;i<MAX_IMAS;i++)
             if(imas[i].tipo!=JOGO_MORTO)
@@ -236,10 +259,11 @@ int Game::gamescreen(int controle){
     return 0;
 }
 
-void Game::processaFase(int mapa[33][59], Jogador *jogador, Ima imas[])
+void Game::processaFase(int mapa[33][59], Jogador *jogador, Personagem imas[], Personagem estrelas[])
 {
     // Procura os elementos
     int contaImas=0;
+    int contaEstrelas=0;
     for(int i=0;i<33;i++)
         for(int j=0;j<59;j++)
         {
@@ -250,6 +274,7 @@ void Game::processaFase(int mapa[33][59], Jogador *jogador, Ima imas[])
                 jogador->y=32*i;
                 jogador->angulo=0;
                 mapa[i][j]=JOGO_CHAO;
+                jogador->vivo=true;
                 break;
             case JOGO_NEGATIVO:
             case JOGO_POSITIVO:
@@ -264,11 +289,46 @@ void Game::processaFase(int mapa[33][59], Jogador *jogador, Ima imas[])
                     contaImas++;
                 }
                 break;
+            case JOGO_ESTRELA:
+                if(contaEstrelas<MAX_ESTRELAS)
+                {
+                    estrelas[contaEstrelas].tipo=mapa[i][j];
+                    estrelas[contaEstrelas].angulo=0;
+                    estrelas[contaEstrelas].velocidade=0;
+                    estrelas[contaEstrelas].x=32*j;
+                    estrelas[contaEstrelas].y=32*i;
+                    estrelas[contaEstrelas].anguloRotacao=rand()%360;
+                    mapa[i][j]=JOGO_CHAO;
+                    contaEstrelas++;
+                }
+                break;
+            case JOGO_ESTRELA0:
+            case JOGO_ESTRELA45:
+            case JOGO_ESTRELA90:
+            case JOGO_ESTRELA135:
+            case JOGO_ESTRELA180:
+            case JOGO_ESTRELA225:
+            case JOGO_ESTRELA270:
+            case JOGO_ESTRELA315:
+                if(contaEstrelas<MAX_ESTRELAS)
+                {
+                    estrelas[contaEstrelas].tipo=mapa[i][j];
+                    estrelas[contaEstrelas].angulo=45*(mapa[i][j]-JOGO_ESTRELA0);
+                    estrelas[contaEstrelas].velocidade=VELOCIDADE_ESTRELA;
+                    estrelas[contaEstrelas].x=32*j;
+                    estrelas[contaEstrelas].y=32*i;
+                    estrelas[contaEstrelas].anguloRotacao=rand()%360;
+                    mapa[i][j]=JOGO_CHAO;
+                    contaEstrelas++;
+                }
+                break;
             }
         }
     // Reseta os imas restantes
     for(int i=contaImas;i<MAX_IMAS;i++)
         imas[i].tipo=JOGO_MORTO;
+    for(int i=contaEstrelas;i<MAX_ESTRELAS;i++)
+        estrelas[i].tipo=JOGO_MORTO;
 }
 
 void Game::atualizaJogador(int mapa[33][59], Jogador *jogador, int controle)
@@ -352,7 +412,7 @@ void Game::atualizaJogador(int mapa[33][59], Jogador *jogador, int controle)
 
 }
 
-void Game::atualizaIma(int mapa[33][59], Ima *ima, Jogador *jogador)
+void Game::atualizaIma(int mapa[33][59], Personagem *ima, Jogador *jogador)
 {
     //  se o jogador está perto para ganhar velocidade e direção
     int xcentroj = jogador->x + (TAM_JOGADOR/2);
@@ -373,6 +433,7 @@ void Game::atualizaIma(int mapa[33][59], Ima *ima, Jogador *jogador)
         // Caso seja maior que 270, normaliza o quadrante (casos especiais)
         if(diferenca>270)
             diferenca=360-diferenca;
+        printf("Diferenca vale: %d\n", diferenca);
         // Se for menor que 90, está apontando para o pólo positivo, se for maior que 90, aponta o põlo negativo
         // Aqui, repele o ímã
         if((diferenca < 45 && ima->tipo==JOGO_POSITIVO) || (diferenca>135 && ima->tipo==JOGO_NEGATIVO))
@@ -380,7 +441,8 @@ void Game::atualizaIma(int mapa[33][59], Ima *ima, Jogador *jogador)
             if(diferenca>90)
                 diferenca = 180-diferenca;
             ima->angulo = anguloJogadorIma;
-            ima->velocidade=VELOCIDADE_REPULSAO_IMA*(45.0-diferenca)/45.0;
+            //ima->velocidade=VELOCIDADE_REPULSAO_IMA*(45.0-diferenca)/45.0;
+            ima->velocidade=VELOCIDADE_REPULSAO_IMA;
             printf("Deu velocidade de repulsao %f\n", ima->velocidade);
         }
         // Aqui faz o contrário, afasta os ímãs
@@ -390,7 +452,8 @@ void Game::atualizaIma(int mapa[33][59], Ima *ima, Jogador *jogador)
             if(diferenca>90)
                 diferenca = 180-diferenca;
             ima->angulo = anguloImaJogador;
-            ima->velocidade=(VELOCIDADE_ATRACAO_IMA)*(45.0-diferenca)/45.0;
+            //ima->velocidade=(VELOCIDADE_ATRACAO_IMA)*(45.0-diferenca)/45.0;
+            ima->velocidade=VELOCIDADE_ATRACAO_IMA;
             if(distancia < TAM_JOGADOR/2 + TAM_IMA +5)
                 ima->velocidade=0;
             printf("Deu velocidade de atracao %f\n", ima->velocidade);
@@ -447,6 +510,100 @@ void Game::atualizaIma(int mapa[33][59], Ima *ima, Jogador *jogador)
     // Atualiza a posição do ímã
     ima->x = x;
     ima->y=y;
+}
+
+void Game::atualizaEstrela(int mapa[33][59], Personagem *estrela)
+{
+    // Se está morrendo, simplesmente decrementa o contador de morte e volta
+    if(estrela->tipo == JOGO_ESTRELA_MORRENDO)
+    {
+        estrela->timer-=2;
+        if(estrela->timer <= 0)
+            estrela->tipo = JOGO_MORTO;
+        return;
+    }
+
+    // Atualiza a rotação
+    estrela->anguloRotacao=(estrela->anguloRotacao+2)%360;
+
+
+    // Futura posição da estrela na tela
+    float x=estrela->x+estrela->velocidade*cos(estrela->angulo*PI/180);
+    float y=estrela->y+estrela->velocidade*sin(estrela->angulo*PI/180);
+
+    // Verifica se o jogador está entrando dentro de um bloco
+    int xesq = (int)x/32;
+    int xdir = ((int)x+TAM_ESTRELA)/32;
+    int ycima = (int)y/32;
+    int ybaixo = ((int)y + TAM_ESTRELA)/32;
+    int xmeio = ((int)x + TAM_ESTRELA/2)/32;
+    int ymeio = ((int)y + TAM_ESTRELA/2)/32;
+
+    bool bateu=false;
+    // Está batendo em cima?
+    if(mapa[ycima][xmeio] != JOGO_CHAO)
+    {
+        y=((ycima+1)*32);
+        estrela->angulo=360-estrela->angulo;
+    }
+    else if(mapa[ybaixo][xmeio] != JOGO_CHAO)
+    {
+        y=((ycima)*32);
+        estrela->angulo=360-estrela->angulo;
+    }
+    // Está batendo à esquerda
+    if(mapa[ymeio][xesq] != JOGO_CHAO)
+    {
+        x=(xesq+1)*32;
+        estrela->angulo=180-estrela->angulo;
+    }
+    else if(mapa[ymeio][xdir] != JOGO_CHAO)
+    {
+        x=((xesq)*32);
+        estrela->angulo=180-estrela->angulo;
+    }
+    if(estrela->angulo<0)
+        estrela->angulo+=360;
+    else
+        estrela->angulo= (int)estrela->angulo%360;
+
+    // Atualiza a posição do ímã
+    estrela->x = x;
+    estrela->y=y;
+
+}
+
+int Game::colisoesImasEstrelas(Personagem imas[], Personagem estrelas[])
+{
+    int placar=0;
+    for(int i=0;i<MAX_IMAS;i++)
+    {
+        // O ímã só mata se está se movendo
+        if(imas[i].velocidade==0)
+            continue;
+        for(int j=0;j<MAX_ESTRELAS;j++)
+        {
+            if(estrelas[j].tipo == JOGO_MORTO || estrelas[j].tipo==JOGO_ESTRELA_MORRENDO)
+                continue;
+            float xcentroe = estrelas[j].x + (TAM_ESTRELA/2);
+            float ycentroe = estrelas[j].y + (TAM_ESTRELA/2);
+            float xcentroi = imas[i].x + TAM_IMA/2;
+            float ycentroi = imas[i].y + TAM_IMA/2;
+            float distancia = sqrt((xcentroe-xcentroi)*(xcentroe-xcentroi)+ (ycentroe-ycentroi)*(ycentroe-ycentroi));
+            if(distancia< TAM_ESTRELA/2 + TAM_IMA/2)
+            {
+                estrelas[j].tipo=JOGO_ESTRELA_MORRENDO;
+                estrelas[j].timer=255;
+                placar+=1;
+            }
+        }
+    }
+    return placar;
+}
+
+bool Game::colisaoJogadorEstrelas(Jogador *jogador, Personagem estrelas[])
+{
+    return false;
 }
 
 float Game::calculaAngulo(const float dx, const float dy)
