@@ -174,6 +174,8 @@ int Game::mainmenuscreen(){
 
     int choice;
     C2D_TrocaCorLimpezaTela(0,0,0);
+    int musica = CA_CarregaMusica("audio/01-menu.ogg");
+    CA_TocaMusica(musica, 1);
     while(!end){
         C2D_LimpaTela();
         C2D_DesenhaTexto(fonteTituloGrande, 960, 350, "Magnetic  Force", C2D_TEXTO_CENTRALIZADO, 230, 230, 230, 255);
@@ -248,6 +250,13 @@ bool Game::gamescreen(Jogador *jogador, int controle, int numFase, int *placar, 
 
     bool acabouFase = false;
     int tempoMensagem=180;
+    char *listaMusicas[4]= {
+        "audio/02-tutorial.ogg",
+        "audio/03-tutorial2.ogg",
+        "audio/05-youknowthosekillright.ogg",
+        "audio/06-thinkfast.ogg"
+    };
+
 
     if(!carregaFase(arquivoFase, mensagem, mapa, arquivoMusica))
     {
@@ -256,6 +265,15 @@ bool Game::gamescreen(Jogador *jogador, int controle, int numFase, int *placar, 
     }
     printf("Fase %d: Mensagem: %s\nMúsica: %s\n", numFase+1, mensagem, arquivoMusica);
 
+    // Se a música for aleatória
+    if(strcmp(arquivoMusica, "random")==0)
+    {
+        int escolha = rand()%4;
+        strcpy(arquivoMusica, listaMusicas[escolha]);
+    }
+
+    int musica = CA_CarregaMusica(arquivoMusica);
+    int musicaClear = CA_CarregaMusica("audio/04-stage_clear.ogg");
 
     // Inicializa a fase com os dados do mapa
     Personagem imas[MAX_IMAS];
@@ -268,6 +286,7 @@ bool Game::gamescreen(Jogador *jogador, int controle, int numFase, int *placar, 
     bool fim=false;
     bool sai=false;
     bool acabouEstrelas=false;
+    CA_TocaMusica(musica, 0);
     while(!fim && !sai)
     {
         // Lógica dos personagens
@@ -306,6 +325,8 @@ bool Game::gamescreen(Jogador *jogador, int controle, int numFase, int *placar, 
             {
                 tempoMensagem=180;
                 sprintf(mensagem, "Stage %d clear", numFase+1);
+                CA_FadeMusica(0);
+                CA_TocaMusica(musicaClear,1);
             }
             // O jogador colidiu com uma estrela?
             if(colisaoJogadorEstrelas(jogador, estrelas))
@@ -371,6 +392,7 @@ bool Game::gamescreen(Jogador *jogador, int controle, int numFase, int *placar, 
         C2D_Sincroniza(C2D_FPS_PADRAO);
 
     }
+    CA_FadeMusica(0);
     if(sai)
         return false;
     return true;
@@ -775,7 +797,10 @@ bool Game::colisaoJogadorEstrelas(Jogador *jogador, Personagem estrelas[])
         float ycentroj = jogador->y + TAM_JOGADOR/2;
         float distancia = sqrt((xcentroe-xcentroj)*(xcentroe-xcentroj)+ (ycentroe-ycentroj)*(ycentroe-ycentroj));
         if(distancia< TAM_ESTRELA/2 + TAM_JOGADOR/2)
+        {
+            CA_TocaEfeito(efeitoJogador, xcentroj);
             return true;
+        }
     }
     return false;
 }
@@ -804,11 +829,13 @@ bool Game::creditsscreen(){
     spriteCreditos = C2D_CarregaSpriteSet("gfx/credits.png", 0, 0);
     if(spriteCreditos==0)
         return false;
-    int tempo=20*60;
+    int tempo=24*60;
     bool sai=false;
     int altura=1080+4069;
     int contador=0;
     C2D_TrocaCorLimpezaTela(0,0,0);
+    int musica = CA_CarregaMusica("audio/07-welldone.ogg");
+    CA_TocaMusica(musica, 1);
     while(!sai && contador < tempo)
     {
         C2D_LimpaTela();
@@ -826,6 +853,7 @@ bool Game::creditsscreen(){
             if(gamepads[0].botoes[i].pressionou)
                 sai=true;
     }
+    CA_FadeMusica(0);
     C2D_RemoveSpriteSet(spriteCreditos);
     return true;
 }
