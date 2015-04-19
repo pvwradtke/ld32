@@ -198,6 +198,8 @@ int Game::gamescreen(int controle){
     mapa[10][49]=JOGO_POSITIVO;
     mapa[23][10]=JOGO_NEGATIVO;
     mapa[20][33]=JOGO_PAREDE;
+    mapa[22][33]=JOGO_PAREDE;
+    mapa[20][35]=JOGO_PAREDE;
 
     // Inicializa a fase com os dados do mapa
     Jogador jogador;
@@ -210,6 +212,9 @@ int Game::gamescreen(int controle){
     {
         // Lógica dos personagens
         atualizaJogador(mapa, &jogador, controle);
+        for(int i=0;i<MAX_IMAS;i++)
+                if(imas[i].tipo!=JOGO_MORTO)
+                    atualizaIma(mapa, &imas[i], &jogador);
 
         if(teclado[C2D_TESC].pressionou || teclado[C2D_TENCERRA].pressionou)
             fim=true;
@@ -228,7 +233,7 @@ int Game::gamescreen(int controle){
             if(imas[i].tipo!=JOGO_MORTO)
                 C2D_DesenhaSprite(spriteIma, imas[i].tipo-JOGO_NEGATIVO, DESLX+(imas[i].x >> FP_SHIFT), DESLY+(imas[i].y >> FP_SHIFT));
         if(controle == game_keyplusmouse)
-            C2D_DesenhaSprite(spritemouse, 0, mouse->x-5, mouse->y-5);
+            C2D_DesenhaSprite(spritemouse, 0, mouse->x-TAM_MOUSE/2, mouse->y-TAM_MOUSE/2);
         C2D_Sincroniza(C2D_FPS_PADRAO);
 
     }
@@ -257,8 +262,8 @@ void Game::processaFase(int mapa[33][59], Jogador *jogador, Ima imas[])
                     imas[contaImas].tipo=mapa[i][j];
                     imas[contaImas].angulo=0;
                     imas[contaImas].velocidade=0;
-                    imas[contaImas].x=(32*j+6)  << FP_SHIFT;
-                    imas[contaImas].y=(32*i+6)  << FP_SHIFT;
+                    imas[contaImas].x=(32*j+(32-TAM_IMA)/2)  << FP_SHIFT;
+                    imas[contaImas].y=(32*i+(32-TAM_IMA)/2)  << FP_SHIFT;
                     mapa[i][j]=JOGO_CHAO;
                     contaImas++;
                 }
@@ -282,7 +287,6 @@ void Game::atualizaJogador(int mapa[33][59], Jogador *jogador, int controle)
         {
             // Calcula o ângulo do deslocamento
             int angulo = calculaAngulo(gamepads[0].eixos[C2D_GLEIXOX], gamepads[0].eixos[C2D_GLEIXOY]);
-            printf("Contador: %04d - Eixo x: %03d - Eixo y: %03d\n", counter++, gamepads[0].eixos[C2D_GLEIXOX], gamepads[0].eixos[C2D_GLEIXOY]);
             // Calcula a nova posição
             x = jogador->x+cos_fp[angulo]*VELOCIDADE_JOGADOR;
             y = jogador->y+sin_fp[angulo]*VELOCIDADE_JOGADOR;
@@ -326,56 +330,101 @@ void Game::atualizaJogador(int mapa[33][59], Jogador *jogador, int controle)
             x=jogador->x+VELOCIDADE_JOGADOR*cos_fp[45];
             y=jogador->y+VELOCIDADE_JOGADOR*sin_fp[45];
         }
-        jogador->angulo=calculaAngulo((mouse->x << FP_SHIFT)-(jogador->x+(16 << FP_SHIFT)), (mouse->y << FP_SHIFT)-(jogador->y+(16 << FP_SHIFT)));
+        jogador->angulo=calculaAngulo((mouse->x << FP_SHIFT)-(jogador->x+((TAM_JOGADOR/2) << FP_SHIFT)), (mouse->y << FP_SHIFT)-(jogador->y+((TAM_JOGADOR/2) << FP_SHIFT)));
     }
     // Verifica se o jogador está entrando dentro de um bloco
-        int xesq = (x >> FP_SHIFT)/32;
-        int xdir = ((x >> FP_SHIFT)+32)/32;
-        int ycima = (y >> FP_SHIFT)/32;
-        int ybaixo = ((y >> FP_SHIFT) + 32)/32;
+    int xesq = (x >> FP_SHIFT)/32;
+    int xdir = ((x >> FP_SHIFT)+32)/32;
+    int ycima = (y >> FP_SHIFT)/32;
+    int ybaixo = ((y >> FP_SHIFT) + 32)/32;
+    int xmeio = ((x >> FP_SHIFT)+16)/32;
+    int ymeio = ((y >> FP_SHIFT) + 16)/32;
     // Está batendo em cima?
-        if(mapa[ycima][xesq] != JOGO_CHAO && mapa[ycima][xdir] != JOGO_CHAO)
-            y=((ycima+1)*32) << FP_SHIFT;
-    // Está batendo embaixo?
-        if(mapa[ybaixo][xesq] != JOGO_CHAO && mapa[ybaixo][xdir] != JOGO_CHAO)
-            y=(ybaixo-1)*32 << FP_SHIFT;
+    if(mapa[ycima][xmeio] != JOGO_CHAO)
+        y=((ycima+1)*32) << FP_SHIFT;
+    else if(mapa[ybaixo][xmeio] != JOGO_CHAO)
+        y=((ycima)*32) << FP_SHIFT;
     // Está batendo à esquerda
-        if(mapa[ycima][xesq] != JOGO_CHAO && mapa[ybaixo][xesq] != JOGO_CHAO)
-            x=(xesq+1)*32 << FP_SHIFT;
-    // Está batendo à direita
-        if(mapa[ybaixo][xdir] != JOGO_CHAO && mapa[ycima][xdir] != JOGO_CHAO)
-            x=(xdir-1)*32 << FP_SHIFT;
-    // Verifica se são cantos (caso à parte)
-    /*int xabs=x>>FP_SHIFT;
-    int yabs=y>>FP_SHIFT;
-    if((mapa[ycima][xesq] != JOGO_CHAO || mapa[ybaixo][xesq] != JOGO_CHAO))
-        if(abs(ycima*32-yabs) <= 16 && abs(xesq*32-xabs) > 16)
-        {
-            x=(xesq+1)*32 << FP_SHIFT;
-            xesq += 1;
-        }
-    if((mapa[ycima][xdir] != JOGO_CHAO || mapa[ybaixo][xdir] != JOGO_CHAO))
-        if(abs(ycima*32-yabs) <=16 && abs(xesq*32-xabs) >16 )
-        {
-            x=(xesq)*32 << FP_SHIFT;
-            xdir -= 1;
-        }
-    if((mapa[ycima][xesq] != JOGO_CHAO || mapa[ycima][xdir] != JOGO_CHAO))
-        if(abs(ycima*32-yabs) > 16 && abs(xesq*32-xabs)<=16)
-        {
-            ycima+=1;
-            y=ycima*32 << FP_SHIFT;
-        }
-    if((mapa[ybaixo][xesq] != JOGO_CHAO || mapa[ybaixo][xdir] != JOGO_CHAO))
-        if(abs(ycima*32-yabs) <16 &&  abs(xesq*32-xabs)<=16)
-        {
-            ybaixo-=1;
-            y=ycima*32 << FP_SHIFT;
-        }*/
+    if(mapa[ymeio][xesq] != JOGO_CHAO)
+        x=(xesq+1)*32 << FP_SHIFT;
+    else if(mapa[ymeio][xdir] != JOGO_CHAO)
+        x=(xesq)*32 << FP_SHIFT;
     // Atualiza a posição do jogador
     jogador->x=x;
     jogador->y=y;
 
+}
+
+void Game::atualizaIma(int mapa[33][59], Ima *ima, Jogador *jogador)
+{
+    //  se o jogador está perto para ganhar velocidade e direção
+    int xcentroj = (jogador->x >> FP_SHIFT) + (TAM_JOGADOR/2);
+    int ycentroj = (jogador->y >> FP_SHIFT) + (TAM_JOGADOR/2);
+    int xcentroi = (ima->x >> FP_SHIFT) + TAM_IMA/2;
+    int ycentroi = (ima->y >> FP_SHIFT) + TAM_IMA/2;
+    // Calcula o quadrado da distância
+    int distancia = (xcentroj-xcentroi)*(xcentroj-xcentroi)+ (ycentroj-ycentroi)*(ycentroj-ycentroi);
+    // Se o quadrado da distância for menor que o quadrado da distância mínima
+    if(distancia < DISTANCIA_JOGADOR*DISTANCIA_JOGADOR)
+    {
+        // Calcula o angulo entre o jogador e o íma
+        int angulo = calculaAngulo(xcentroi-xcentroj, ycentroi-ycentroj);
+        ima->angulo = angulo;
+        // Calcula a forca entre o ímã e o jogador
+        int forca=100-((distancia*100)/(DISTANCIA_JOGADOR*DISTANCIA_JOGADOR));
+
+        ima->velocidade = VELOCIDADE_IMA<<FP_SHIFT;
+    }
+    // Futura posição do ímã na tela
+    int x=ima->x+(ima->velocidade*cos_fp[ima->angulo]) >> FP_SHIFT;
+    int y=ima->y+(ima->velocidade*sin_fp[ima->angulo]) >> FP_SHIFT;
+
+    // Verifica se o jogador está entrando dentro de um bloco
+    int xesq = (x >> FP_SHIFT)/32;
+    int xdir = ((x >> FP_SHIFT)+TAM_IMA)/32;
+    int ycima = (y >> FP_SHIFT)/32;
+    int ybaixo = ((y >> FP_SHIFT) + TAM_IMA)/32;
+    int xmeio = ((x >> FP_SHIFT)+TAM_IMA/2)/32;
+    int ymeio = ((y >> FP_SHIFT) + TAM_IMA/2)/32;
+
+    bool bateu=false;
+    // Está batendo em cima?
+    if(mapa[ycima][xmeio] != JOGO_CHAO)
+    {
+        y=((ycima+1)*32) << FP_SHIFT;
+        ima->angulo=360-ima->angulo;
+    }
+    else if(mapa[ybaixo][xmeio] != JOGO_CHAO)
+    {
+        y=((ycima)*32+32-TAM_IMA) << FP_SHIFT;
+        ima->angulo=360-ima->angulo;
+    }
+    // Está batendo à esquerda
+    if(mapa[ymeio][xesq] != JOGO_CHAO)
+    {
+        x=(xesq+1)*32 << FP_SHIFT;
+        ima->angulo=180-ima->angulo;
+    }
+    else if(mapa[ymeio][xdir] != JOGO_CHAO)
+    {
+        x=((xesq)*32+32-TAM_IMA) << FP_SHIFT;
+        ima->angulo=180-ima->angulo;
+    }
+    if(ima->angulo<0)
+        ima->angulo+=360;
+    else
+        ima->angulo%=360;
+    // Simula o atrito
+    if(ima->velocidade>0)
+    {
+        ima->velocidade-=7;
+        if(ima->velocidade<0)
+            ima->velocidade=0;
+    }
+
+    // Atualiza a posição do ímã
+    ima->x = x;
+    ima->y=y;
 }
 
 int Game::calculaAngulo(const int dx, const int dy)

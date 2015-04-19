@@ -24,9 +24,15 @@
 // Define the number of bits to shift left or right values
 #define FP_SHIFT 11
 // The fixed point factor (same as shifting FP_SHIFT bits to the left)
-#define FP_FACTOR   2 << FP_SHIFT
+#define FP_FACTOR   1 << FP_SHIFT
 
 #define VELOCIDADE_JOGADOR  5
+#define VELOCIDADE_IMA      8
+#define DISTANCIA_JOGADOR   100
+
+#define TAM_MOUSE       11
+#define TAM_IMA         20
+#define TAM_JOGADOR     32
 
 // All values are multiplied by 256 for fixed point precision
 typedef struct TagEventDescriptor
@@ -71,6 +77,7 @@ public:
     int gamescreen(int controle);
     void processaFase(int mapa[33][59], Jogador *jogador, Ima imas[]);
     void atualizaJogador(int mapa[33][59], Jogador *jogador, int controle);
+    void atualizaIma(int mapa[33][59], Ima *ima, Jogador *jogador);
     int  calculaAngulo(const int dx, const int dy);
     bool loadhighscore();
     bool savehighscore();
