@@ -35,6 +35,9 @@
 #define MAPA_LINHAS     33
 #define MAPA_COLUNAS    59
 
+#define MAX_FASES       64
+#define MAX_TEXTO       256
+
 typedef int Mapa[MAPA_LINHAS][MAPA_COLUNAS];
 
 // All values are multiplied by 256 for fixed point precision
@@ -82,15 +85,16 @@ public:
     bool run();
     bool splashscreen();
     int mainmenuscreen();
-    int gamescreen(int controle, int numFase, char *arquivoFase);
+    bool carregaListaFases(char *nome, int *numFases, char lista[MAX_FASES][MAX_TEXTO]);
+    bool gamescreen(Jogador *jogador, int controle, int numFase, int *placar, char *arquivoFase);
     void processaFase(Mapa mapa, Jogador *jogador, Personagem imas[], Personagem estrelas[]);
-    bool carregaFase(char *name, char *mensagem, Mapa mapa);
+    bool carregaFase(char *name, char *mensagem, Mapa mapa, char *song);
     void atualizaJogador(Mapa mapa, Jogador *jogador, int controle);
     void atualizaIma(Mapa mapa, Personagem *ima, Jogador *jogador);
     void atualizaEstrela(Mapa mapa, Personagem *estrela);
     int colisoesImasEstrelas(Personagem imas[], Personagem estrelas[]);
     bool colisaoJogadorEstrelas(Jogador *jogador, Personagem estrelas[]);
-    float  calculaAngulo(const float dx, const float dy);
+    float calculaAngulo(const float dx, const float dy);
     bool loadhighscore();
     bool savehighscore();
     bool creditsscreen();
@@ -99,10 +103,14 @@ private:
     const C2D_Botao *teclado;
     const C2D_Gamepad *gamepads;
     const C2D_Mouse *mouse;
-    int     fonteTitulo;
+    int     fonteTituloPequena;
+    int     fonteTituloGrande;
+    int     fonteMensagem;
     int     fonteSistema;
+    int     fontePlacar;
     int     fonteURL;
     int     highScore;
+    char    listaFases[MAX_FASES][MAX_TEXTO];
 };
 
 #endif	/* GAME_HPP */
