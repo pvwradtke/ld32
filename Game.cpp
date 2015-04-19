@@ -32,6 +32,9 @@ bool Game::init(bool fullscreen){
         fonteTituloGrande = C2D_CarregaFonte("gfx/Abduction.ttf", "titulo_grande", 130);
         fonteMensagem = C2D_CarregaFonte("gfx/Stac555n.ttf", "titulo_pequena", 60);
         fontePlacar = C2D_CarregaFonte("gfx/DS-DIGIB.TTF", "titulo_placar", 32);
+        efeitoInimigo = CA_CarregaEfeito("audio/enemyhit.ogg");
+        efeitoJogador = CA_CarregaEfeito("audio/playerhit.ogg");
+        efeitoRepele = CA_CarregaEfeito("audio/repel.ogg");
         teclado = C2D_PegaTeclas();
         gamepads = C2D_PegaGamepads();
         mouse = C2D_PegaMouse();
@@ -596,6 +599,8 @@ void Game::atualizaIma(Mapa mapa, Personagem *ima, Jogador *jogador)
                 diferenca = 180-diferenca;
             ima->angulo = anguloJogadorIma;
             //ima->velocidade=VELOCIDADE_REPULSAO_IMA*(45.0-diferenca)/45.0;
+            // Se a velocidade é zero, toca o efeito
+            CA_TocaEfeito(efeitoRepele, xcentroi);
             ima->velocidade=VELOCIDADE_REPULSAO_IMA;
             ////printf("Deu velocidade de repulsao %f\n", ima->velocidade);
         }
@@ -749,6 +754,7 @@ int Game::colisoesImasEstrelas(Personagem imas[], Personagem estrelas[])
                 estrelas[j].tipo=JOGO_ESTRELA_MORRENDO;
                 estrelas[j].timer=255;
                 placar+=1;
+                CA_TocaEfeito(efeitoInimigo, xcentroe);
             }
         }
     }

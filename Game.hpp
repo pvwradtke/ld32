@@ -111,6 +111,7 @@ private:
     int     fonteURL;
     int     highScore;
     char    listaFases[MAX_FASES][MAX_TEXTO];
+    int efeitoRepele, efeitoJogador, efeitoInimigo;
 };
 
 #endif	/* GAME_HPP */
