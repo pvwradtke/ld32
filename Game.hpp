@@ -21,14 +21,10 @@
 
 #define PI          3.14159265
 
-// Define the number of bits to shift left or right values
-#define FP_SHIFT 11
-// The fixed point factor (same as shifting FP_SHIFT bits to the left)
-#define FP_FACTOR   1 << FP_SHIFT
-
 #define VELOCIDADE_JOGADOR  5
-#define VELOCIDADE_IMA      8
-#define DISTANCIA_JOGADOR   100
+#define VELOCIDADE_REPULSAO_IMA         10
+#define VELOCIDADE_ATRACAO_IMA          3
+#define DISTANCIA_JOGADOR   150
 
 #define TAM_MOUSE       11
 #define TAM_IMA         20
@@ -48,18 +44,18 @@ typedef struct TagEventDescriptor
 
 typedef struct TagJogador
 {
-    int x;
-    int y;
-    int angulo;
+    float x;
+    float y;
+    float angulo;
 }Jogador;
 
 typedef struct TagIma
 {
     int tipo;
-    int  x;
-    int  y;
-    int  angulo;
-    int  velocidade;
+    float  x;
+    float  y;
+    float  angulo;
+    float  velocidade;
 }Ima;
 
 class Game {
@@ -78,7 +74,7 @@ public:
     void processaFase(int mapa[33][59], Jogador *jogador, Ima imas[]);
     void atualizaJogador(int mapa[33][59], Jogador *jogador, int controle);
     void atualizaIma(int mapa[33][59], Ima *ima, Jogador *jogador);
-    int  calculaAngulo(const int dx, const int dy);
+    float  calculaAngulo(const float dx, const float dy);
     bool loadhighscore();
     bool savehighscore();
     bool creditsscreen();
