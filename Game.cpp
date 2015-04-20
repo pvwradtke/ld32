@@ -85,10 +85,12 @@ bool Game::run(){
                     int placar;
                     int previousHighScore = highScore;
                     int faseAtual=0;
+                    bool resultado=false;
                     while(faseAtual<numFases)
                     {
                         placar=placarFinal;
-                        if(gamescreen(&jogador, currentstate, faseAtual, &placar, listaFases[faseAtual]))
+                        resultado = gamescreen(&jogador, currentstate, faseAtual, &placar, listaFases[faseAtual]);
+                        if(resultado)
                         {
                             if(jogador.vivo)
                             {
@@ -105,8 +107,10 @@ bool Game::run(){
                     }
                     if(highScore > previousHighScore)
                         savehighscore();
-                    // tirar daqui para a tela de vitória depois
-                    currentstate = Game::credits;
+                    if(resultado)
+                        currentstate = Game::credits;
+                    else
+                        currentstate = Game::mainmenu;
                 }
                 break;
             }
@@ -286,7 +290,7 @@ bool Game::gamescreen(Jogador *jogador, int controle, int numFase, int *placar, 
     bool fim=false;
     bool sai=false;
     bool acabouEstrelas=false;
-    CA_TocaMusica(musica, 0);
+    CA_TocaMusica(musica, -1);
     while(!fim && !sai)
     {
         // Lógica dos personagens
@@ -321,6 +325,8 @@ bool Game::gamescreen(Jogador *jogador, int controle, int numFase, int *placar, 
                 if(estrelas[i].tipo!=JOGO_MORTO)
                     acabouEstrelas=false;
             }
+            if(teclado[C2D_TF1].pressionou)
+                acabouEstrelas=true;
             if(acabouEstrelas)
             {
                 tempoMensagem=180;
@@ -378,7 +384,7 @@ bool Game::gamescreen(Jogador *jogador, int controle, int numFase, int *placar, 
         if(controle == game_keyplusmouse)
             C2D_DesenhaSprite(spritemouse, 0, mouse->x-TAM_MOUSE/2, mouse->y-TAM_MOUSE/2);
         // Desenha o placar e demais informações
-        sprintf(texto, "Stage %02d", numFase);
+        sprintf(texto, "Stage %02d", numFase+1);
         C2D_DesenhaTexto(fontePlacar, 50, 20, texto, C2D_TEXTO_ESQUERDA, 0, 255, 0, 255);
         sprintf(texto, "Score: %03d00", *placar);
         C2D_DesenhaTexto(fontePlacar, 960, 20, texto, C2D_TEXTO_CENTRALIZADO, 0, 255, 0, 255);

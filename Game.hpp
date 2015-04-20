@@ -24,7 +24,7 @@
 #define VELOCIDADE_JOGADOR  5
 #define VELOCIDADE_REPULSAO_IMA         10
 #define VELOCIDADE_ATRACAO_IMA          3
-#define VELOCIDADE_ESTRELA              8
+#define VELOCIDADE_ESTRELA              6
 #define DISTANCIA_JOGADOR   150
 
 #define TAM_MOUSE       11
