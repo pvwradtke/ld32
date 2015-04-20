@@ -24,7 +24,12 @@ Game::~Game() {
 }
 
 bool Game::init(bool fullscreen){
-    if(C2D_Inicia(1920, 1080, C2D_JANELA, "Ludum Dare 32", true))
+    bool status = false;
+    if(fullscreen)
+        status = C2D_Inicia(1920, 1080, C2D_TELA_CHEIA, "Ludum Dare 32", true);
+    else
+        status = C2D_Inicia(1920, 1080, C2D_JANELA, "Ludum Dare 32", true);
+    if(status)
     {
         fonteSistema = C2D_CarregaFonte("gfx/TerminusBold.ttf", "sistema", 24);
         fonteURL = C2D_CarregaFonte("gfx/TerminusBold.ttf", "URL", 60);
@@ -532,35 +537,39 @@ void Game::atualizaJogador(Mapa mapa, Jogador *jogador, int controle)
         }
         else
         {
-            if(teclado[C2D_TESQUERDA].pressionando && !teclado[C2D_TCIMA].pressionando && !teclado[C2D_TBAIXO].pressionando)
+            if((teclado[C2D_TESQUERDA].pressionando && !teclado[C2D_TCIMA].pressionando && !teclado[C2D_TBAIXO].pressionando) ||
+               (teclado[C2D_TA].pressionando && !teclado[C2D_TW].pressionando && !teclado[C2D_TS].pressionando))
                 x=jogador->x-VELOCIDADE_JOGADOR;
-            else if(teclado[C2D_TDIREITA].pressionando && !teclado[C2D_TCIMA].pressionando && !teclado[C2D_TBAIXO].pressionando)
+            else if((teclado[C2D_TDIREITA].pressionando && !teclado[C2D_TCIMA].pressionando && !teclado[C2D_TBAIXO].pressionando) ||
+                    (teclado[C2D_TD].pressionando && !teclado[C2D_TW].pressionando && !teclado[C2D_TS].pressionando))
                 x=jogador->x+VELOCIDADE_JOGADOR;
-            else if(teclado[C2D_TCIMA].pressionando && !teclado[C2D_TDIREITA].pressionando && !teclado[C2D_TESQUERDA].pressionando)
+            else if((teclado[C2D_TCIMA].pressionando && !teclado[C2D_TDIREITA].pressionando && !teclado[C2D_TESQUERDA].pressionando) ||
+                    (teclado[C2D_TW].pressionando && !teclado[C2D_TD].pressionando && !teclado[C2D_TA].pressionando))
                 y=jogador->y-VELOCIDADE_JOGADOR;
-            else if(teclado[C2D_TBAIXO].pressionando && !teclado[C2D_TDIREITA].pressionando && !teclado[C2D_TESQUERDA].pressionando)
+            else if((teclado[C2D_TBAIXO].pressionando && !teclado[C2D_TDIREITA].pressionando && !teclado[C2D_TESQUERDA].pressionando) ||
+                    (teclado[C2D_TS].pressionando && !teclado[C2D_TD].pressionando && !teclado[C2D_TA].pressionando))
                 y=jogador->y+VELOCIDADE_JOGADOR;
-            else if(teclado[C2D_TCIMA].pressionando && teclado[C2D_TDIREITA].pressionando)
+            else if((teclado[C2D_TCIMA].pressionando && teclado[C2D_TDIREITA].pressionando) || (teclado[C2D_TW].pressionando && teclado[C2D_TD].pressionando))
             {
                 x=jogador->x+VELOCIDADE_JOGADOR*0.707106781;
                 y=jogador->y-VELOCIDADE_JOGADOR*0.707106781;
             }
-            else if(teclado[C2D_TCIMA].pressionando && teclado[C2D_TESQUERDA].pressionando)
+            else if((teclado[C2D_TCIMA].pressionando && teclado[C2D_TESQUERDA].pressionando) || (teclado[C2D_TW].pressionando && teclado[C2D_TA].pressionando))
             {
                 x=jogador->x-VELOCIDADE_JOGADOR*0.707106781;
                 y=jogador->y-VELOCIDADE_JOGADOR*0.707106781;
             }
-            else if(teclado[C2D_TBAIXO].pressionando && teclado[C2D_TESQUERDA].pressionando)
+            else if((teclado[C2D_TBAIXO].pressionando && teclado[C2D_TESQUERDA].pressionando) || (teclado[C2D_TS].pressionando && teclado[C2D_TA].pressionando))
             {
                 x=jogador->x-VELOCIDADE_JOGADOR*0.707106781;
                 y=jogador->y+VELOCIDADE_JOGADOR*0.707106781;
             }
-            else if(teclado[C2D_TBAIXO].pressionando && teclado[C2D_TESQUERDA].pressionando)
+            else if((teclado[C2D_TBAIXO].pressionando && teclado[C2D_TESQUERDA].pressionando) || (teclado[C2D_TS].pressionando && teclado[C2D_TA].pressionando))
             {
                 x=jogador->x-VELOCIDADE_JOGADOR*0.707106781;
                 y=jogador->y+VELOCIDADE_JOGADOR*0.707106781;
             }
-            else if(teclado[C2D_TBAIXO].pressionando && teclado[C2D_TDIREITA].pressionando)
+            else if((teclado[C2D_TBAIXO].pressionando && teclado[C2D_TDIREITA].pressionando) || (teclado[C2D_TS].pressionando && teclado[C2D_TD].pressionando))
             {
                 x=jogador->x+VELOCIDADE_JOGADOR*0.707106781;
                 y=jogador->y+VELOCIDADE_JOGADOR*0.707106781;
